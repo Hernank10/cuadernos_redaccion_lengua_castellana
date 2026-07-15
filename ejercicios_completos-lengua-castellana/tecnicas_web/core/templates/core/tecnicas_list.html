@@ -1,0 +1,117 @@
+{% extends 'core/base.html' %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-3">
+        <div class="sidebar-sticky">
+            <h5><i class="bi bi-funnel"></i> Filtros</h5>
+            <div class="list-group mb-3">
+                <a href="{% url 'core:tecnicas_list' %}" class="list-group-item list-group-item-action {% if not categoria_actual %}active{% endif %}">
+                    Todas <span class="badge bg-secondary float-end">{{ tecnicas.paginator.count }}</span>
+                </a>
+                {% for cat in categorias %}
+                <a href="{% url 'core:tecnicas_list' %}?categoria={{ cat }}" class="list-group-item list-group-item-action {% if categoria_actual == cat %}active{% endif %}">
+                    {{ cat }}
+                    <span class="badge bg-secondary float-end">{{ cat.total }}</span>
+                </a>
+                {% endfor %}
+            </div>
+            {% if q %}
+            <div class="alert alert-info">
+                <i class="bi bi-search"></i> Buscando: "{{ q }}"
+                <a href="{% url 'core:tecnicas_list' %}" class="float-end"><i class="bi bi-x-circle"></i></a>
+            </div>
+            {% endif %}
+            <div class="card bg-light">
+                <div class="card-body">
+                    <h6><i class="bi bi-info-circle"></i> ¿Cómo usar?</h6>
+                    <small>
+                        1. Explora las técnicas disponibles<br>
+                        2. Haz clic en "Ver Quiz"<br>
+                        3. ¡Practica con el quiz interactivo!
+                    </small>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-9">
+        <h3><i class="bi bi-list-ul"></i> Técnicas</h3>
+        <p class="text-muted">{{ tecnicas.paginator.count }} técnicas encontradas</p>
+        
+        {% for tecnica in tecnicas %}
+        <div class="card card-hover mb-3">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-start">
+                    <div class="flex-grow-1">
+                        <h5 class="card-title mb-2">
+                            {{ tecnica.titulo|truncatechars:100 }}
+                        </h5>
+                        <div class="mb-2">
+                            <span class="badge bg-primary">{{ tecnica.categoria }}</span>
+                            {% if tecnica.grado and tecnica.grado != 'General' %}
+                            <span class="badge bg-secondary">🎓 {{ tecnica.grado }}</span>
+                            {% endif %}
+                            <span class="badge bg-info">📁 {{ tecnica.tipo|default:"HTML" }}</span>
+                            {% if 'quiz' in tecnica.titulo|lower or 'flashcard' in tecnica.titulo|lower or 'ejercicio' in tecnica.titulo|lower %}
+                            <span class="badge bg-success">🎯 Quiz interactivo</span>
+                            {% endif %}
+                        </div>
+                        <small class="text-muted">
+                            <i class="bi bi-hash"></i> ID: {{ tecnica.id }}
+                            {% if tecnica.ruta_archivo %}
+                            · <i class="bi bi-file-earmark"></i> {{ tecnica.ruta_archivo|truncatechars:30 }}
+                            {% endif %}
+                        </small>
+                    </div>
+                    <div class="ms-3">
+                        <a href="{% url 'core:tecnica_detail' tecnica.id %}" target="_blank" class="btn btn-primary btn-lg">
+                            <i class="bi bi-play-circle"></i> Ver Quiz
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% empty %}
+        <div class="alert alert-info">
+            <i class="bi bi-info-circle"></i> No se encontraron técnicas
+        </div>
+        {% endfor %}
+        
+        {% if tecnicas.has_other_pages %}
+        <nav aria-label="Page navigation">
+            <ul class="pagination justify-content-center">
+                {% if tecnicas.has_previous %}
+                <li class="page-item">
+                    <a class="page-link" href="?page=1{% if q %}&q={{ q }}{% endif %}{% if categoria_actual %}&categoria={{ categoria_actual }}{% endif %}">
+                        <i class="bi bi-chevron-double-left"></i>
+                    </a>
+                </li>
+                <li class="page-item">
+                    <a class="page-link" href="?page={{ tecnicas.previous_page_number }}{% if q %}&q={{ q }}{% endif %}{% if categoria_actual %}&categoria={{ categoria_actual }}{% endif %}">
+                        <i class="bi bi-chevron-left"></i>
+                    </a>
+                </li>
+                {% endif %}
+                
+                <li class="page-item active">
+                    <span class="page-link">{{ tecnicas.number }} / {{ tecnicas.paginator.num_pages }}</span>
+                </li>
+                
+                {% if tecnicas.has_next %}
+                <li class="page-item">
+                    <a class="page-link" href="?page={{ tecnicas.next_page_number }}{% if q %}&q={{ q }}{% endif %}{% if categoria_actual %}&categoria={{ categoria_actual }}{% endif %}">
+                        <i class="bi bi-chevron-right"></i>
+                    </a>
+                </li>
+                <li class="page-item">
+                    <a class="page-link" href="?page={{ tecnicas.paginator.num_pages }}{% if q %}&q={{ q }}{% endif %}{% if categoria_actual %}&categoria={{ categoria_actual }}{% endif %}">
+                        <i class="bi bi-chevron-double-right"></i>
+                    </a>
+                </li>
+                {% endif %}
+            </ul>
+        </nav>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,11 @@
+[core]
+	repositoryformatversion = 0
+	filemode = true
+	bare = false
+	logallrefupdates = true
+[branch "main"]
+	vscode-merge-base = origin/main
+[lfs]
+	repositoryformatversion = 0
+[lfs "https://github.com/Hernank10/cuadernos_redaccion_lengua_castellana.git/info/lfs"]
+	access = basic

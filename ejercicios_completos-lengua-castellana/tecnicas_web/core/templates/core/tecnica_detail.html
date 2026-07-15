@@ -1,0 +1,112 @@
+{% extends 'core/base.html' %}
+{% load static %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-12">
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a href="{% url 'core:index' %}">Inicio</a></li>
+                <li class="breadcrumb-item"><a href="{% url 'core:tecnicas_list' %}">Técnicas</a></li>
+                <li class="breadcrumb-item active">{{ tecnica.titulo|truncatechars:50 }}</li>
+            </ol>
+        </nav>
+        
+        <div class="card">
+            <div class="card-header bg-primary text-white">
+                <div class="d-flex justify-content-between align-items-center">
+                    <h3 class="mb-0">{{ tecnica.titulo }}</h3>
+                    <span class="badge bg-light text-dark">{{ tecnica.categoria }}</span>
+                </div>
+                {% if tecnica.grado and tecnica.grado != 'General' %}
+                <span class="badge bg-info">🎓 {{ tecnica.grado }}</span>
+                {% endif %}
+                <span class="badge bg-secondary">📁 {{ tecnica.tipo|default:"N/A" }}</span>
+            </div>
+            
+            <div class="card-body">
+                {% if estilo %}
+                <style>{{ estilo|safe }}</style>
+                {% endif %}
+                
+                <div class="contenido-tecnica">
+                    {{ contenido_html|default:tecnica.contenido|safe }}
+                </div>
+                
+                {% if tecnicas_json %}
+                <hr>
+                <h4><i class="bi bi-diagram-3"></i> Técnicas extraídas del JSON</h4>
+                <div class="accordion" id="accordionJson">
+                    {% for tj in tecnicas_json %}
+                    <div class="accordion-item">
+                        <h2 class="accordion-header" id="heading{{ tj.id }}">
+                            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapse{{ tj.id }}">
+                                <strong>Técnica {{ tj.tecnica_numero }}:</strong> {{ tj.titulo_tecnica }}
+                            </button>
+                        </h2>
+                        <div id="collapse{{ tj.id }}" class="accordion-collapse collapse" data-bs-parent="#accordionJson">
+                            <div class="accordion-body">
+                                {% if tj.teoria %}<p><strong>Teoría:</strong> {{ tj.teoria }}</p>{% endif %}
+                                {% if tj.ejemplo %}<p><strong>Ejemplo:</strong> {{ tj.ejemplo }}</p>{% endif %}
+                                {% if tj.ejercicio %}<p><strong>Ejercicio:</strong> {{ tj.ejercicio }}</p>{% endif %}
+                                {% if tj.respuesta %}<p><strong>Respuesta:</strong> {{ tj.respuesta }}</p>{% endif %}
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+                {% endif %}
+            </div>
+            
+            <div class="card-footer text-muted">
+                <div class="d-flex justify-content-between">
+                    <span><i class="bi bi-hash"></i> ID: {{ tecnica.id }}</span>
+                    <span><i class="bi bi-clock"></i> {{ tecnica.fecha_creacion|date:"d/m/Y H:i" }}</span>
+                </div>
+                {% if tecnica.ruta_archivo %}
+                <small><i class="bi bi-file-earmark"></i> {{ tecnica.ruta_archivo }}</small>
+                {% endif %}
+            </div>
+        </div>
+        
+        <div class="mt-3 d-flex gap-2">
+            <a href="{% url 'core:tecnicas_list' %}" class="btn btn-secondary">
+                <i class="bi bi-arrow-left"></i> Volver a la lista
+            </a>
+            {% if tecnica.categoria %}
+            <a href="{% url 'core:tecnicas_list' %}?categoria={{ tecnica.categoria }}" class="btn btn-outline-primary">
+                <i class="bi bi-tag"></i> Más de {{ tecnica.categoria }}
+            </a>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<style>
+.contenido-tecnica {
+    font-family: inherit;
+    line-height: 1.6;
+    max-width: 100%;
+    overflow: auto;
+}
+.contenido-tecnica img {
+    max-width: 100%;
+    height: auto;
+}
+.contenido-tecnica pre {
+    background: #f8f9fa;
+    padding: 1rem;
+    border-radius: 4px;
+    overflow: auto;
+}
+.contenido-tecnica table {
+    width: 100%;
+    border-collapse: collapse;
+}
+.contenido-tecnica table td, 
+.contenido-tecnica table th {
+    border: 1px solid #dee2e6;
+    padding: 8px;
+}
+</style>
+{% endblock %}
