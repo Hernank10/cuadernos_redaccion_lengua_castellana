@@ -72,6 +72,7 @@ INSTALLED_APPS += [
     'usuarios',
     'cursos',
     'evaluaciones',
+    'generador',
     'progreso',
 ]
 

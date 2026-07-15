@@ -1,0 +1,115 @@
+{% extends 'core/base.html' %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-12">
+        <div class="card">
+            <div class="card-header {% if resultado.aprobado %}bg-success{% else %}bg-danger{% endif %} text-white">
+                <h4 class="mb-0">{{ evaluacion.titulo }} - Resultados</h4>
+            </div>
+            <div class="card-body">
+                <div class="row text-center mb-4">
+                    <div class="col-md-4">
+                        <div class="card">
+                            <div class="card-body">
+                                <h5>Puntaje</h5>
+                                <h2 class="{% if resultado.aprobado %}text-success{% else %}text-danger{% endif %}">
+                                    {{ resultado.puntaje_obtenido|floatformat:1 }}%
+                                </h2>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="card">
+                            <div class="card-body">
+                                <h5>Estado</h5>
+                                <h2>{% if resultado.aprobado %}✅ Aprobado{% else %}❌ No Aprobado{% endif %}</h2>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="card">
+                            <div class="card-body">
+                                <h5>Intentos</h5>
+                                <h2>{{ resultado.intentos }}</h2>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <h4>Revisión de Preguntas</h4>
+                <div class="accordion" id="accordionResultados">
+                    {% for item in preguntas_data %}
+                    <div class="accordion-item">
+                        <h2 class="accordion-header">
+                            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" 
+                                    data-bs-target="#collapse{{ forloop.counter }}">
+                                <div class="d-flex justify-content-between w-100 me-3">
+                                    <span>
+                                        {% if item.es_correcta %}
+                                            <i class="bi bi-check-circle-fill text-success"></i>
+                                        {% else %}
+                                            <i class="bi bi-x-circle-fill text-danger"></i>
+                                        {% endif %}
+                                        Pregunta {{ forloop.counter }}
+                                    </span>
+                                    <span>
+                                        <span class="badge bg-{% if item.es_correcta %}success{% else %}danger{% endif %}">
+                                            {{ item.puntaje_obtenido }}/{{ item.pregunta.puntaje }} pts
+                                        </span>
+                                    </span>
+                                </div>
+                            </button>
+                        </h2>
+                        <div id="collapse{{ forloop.counter }}" class="accordion-collapse collapse" 
+                             data-bs-parent="#accordionResultados">
+                            <div class="accordion-body">
+                                <p><strong>{{ item.pregunta.pregunta }}</strong></p>
+                                <p><small class="text-muted">Tipo: {{ item.pregunta.get_tipo_display }}</small></p>
+                                
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <div class="card border-{% if item.es_correcta %}success{% else %}danger{% endif %}">
+                                            <div class="card-body">
+                                                <h6>Tu respuesta</h6>
+                                                <p class="{% if item.es_correcta %}text-success{% else %}text-danger{% endif %}">
+                                                    {{ item.respuesta_usuario|default:"No respondida" }}
+                                                </p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="card border-success">
+                                            <div class="card-body">
+                                                <h6>Respuesta correcta</h6>
+                                                <p class="text-success">{{ item.respuesta_correcta }}</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                {% if item.pregunta.explicacion %}
+                                <div class="mt-2">
+                                    <div class="alert alert-info">
+                                        <strong>💡 Explicación:</strong> {{ item.pregunta.explicacion }}
+                                    </div>
+                                </div>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+                
+                <div class="text-center mt-4">
+                    <a href="{% url 'evaluaciones:lista' %}" class="btn btn-primary">
+                        <i class="bi bi-arrow-left"></i> Volver a Evaluaciones
+                    </a>
+                    <a href="{% url 'evaluaciones:detalle' evaluacion.id %}" class="btn btn-outline-secondary">
+                        <i class="bi bi-arrow-repeat"></i> Reintentar
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

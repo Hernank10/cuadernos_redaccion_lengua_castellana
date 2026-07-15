@@ -1,0 +1,147 @@
+{% extends 'core/base.html' %}
+{% load static %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-12">
+        <div class="card">
+            <div class="card-header bg-primary text-white">
+                <div class="d-flex justify-content-between">
+                    <h4 class="mb-0">{{ evaluacion.titulo }}</h4>
+                    <div>
+                        <span class="badge bg-light text-dark">{{ evaluacion.duracion_minutos }} min</span>
+                        <span class="badge bg-light text-dark">{{ total_preguntas }} preguntas</span>
+                    </div>
+                </div>
+            </div>
+            <div class="card-body">
+                <div class="progress mb-3">
+                    <div class="progress-bar bg-success" id="progreso" role="progressbar" style="width: 0%">
+                        0%
+                    </div>
+                </div>
+                
+                <form id="evaluacion-form" method="post" action="{% url 'evaluaciones:finalizar' evaluacion.id %}">
+                    {% csrf_token %}
+                    
+                    {% for pregunta in preguntas %}
+                    <div class="pregunta-item mb-4" data-pregunta="{{ pregunta.id }}">
+                        <div class="card">
+                            <div class="card-body">
+                                <h5>Pregunta {{ forloop.counter }} de {{ total_preguntas }}</h5>
+                                <p class="card-text">{{ pregunta.pregunta }}</p>
+                                <p><small class="text-muted">Puntaje: {{ pregunta.puntaje }} pts | Tipo: {{ pregunta.get_tipo_display }}</small></p>
+                                
+                                {% if pregunta.tipo == 'multiple' %}
+                                <div class="opciones">
+                                    {% for opcion in pregunta.opciones %}
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="radio" 
+                                               name="pregunta_{{ pregunta.id }}" 
+                                               value="{{ forloop.counter0 }}"
+                                               data-pregunta="{{ pregunta.id }}">
+                                        <label class="form-check-label">{{ opcion }}</label>
+                                    </div>
+                                    {% endfor %}
+                                </div>
+                                
+                                {% elif pregunta.tipo == 'verdadero_falso' %}
+                                <div class="opciones">
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="radio" 
+                                               name="pregunta_{{ pregunta.id }}" 
+                                               value="V"
+                                               data-pregunta="{{ pregunta.id }}">
+                                        <label class="form-check-label">Verdadero</label>
+                                    </div>
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="radio" 
+                                               name="pregunta_{{ pregunta.id }}" 
+                                               value="F"
+                                               data-pregunta="{{ pregunta.id }}">
+                                        <label class="form-check-label">Falso</label>
+                                    </div>
+                                </div>
+                                
+                                {% elif pregunta.tipo == 'completar' %}
+                                <div class="form-group">
+                                    <input type="text" class="form-control" 
+                                           name="pregunta_{{ pregunta.id }}"
+                                           placeholder="Escribe tu respuesta..."
+                                           data-pregunta="{{ pregunta.id }}">
+                                </div>
+                                
+                                {% else %}
+                                <div class="form-group">
+                                    <textarea class="form-control" rows="3"
+                                              name="pregunta_{{ pregunta.id }}"
+                                              placeholder="Escribe tu respuesta detallada..."
+                                              data-pregunta="{{ pregunta.id }}"></textarea>
+                                </div>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                    
+                    <div class="text-center mt-4">
+                        <button type="submit" class="btn btn-success btn-lg" onclick="return confirm('¿Seguro que quieres finalizar la evaluación?')">
+                            <i class="bi bi-check-circle"></i> Finalizar Evaluación
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const inputs = document.querySelectorAll('input, textarea');
+    const totalPreguntas = {{ total_preguntas }};
+    const preguntasRespondidas = new Set();
+    
+    inputs.forEach(input => {
+        input.addEventListener('change', function() {
+            const preguntaId = this.dataset.pregunta;
+            if (preguntaId) {
+                preguntasRespondidas.add(preguntaId);
+                actualizarProgreso();
+                
+                // Guardar respuesta automáticamente
+                const formData = new FormData();
+                formData.append('pregunta_id', preguntaId);
+                formData.append('respuesta', this.value);
+                
+                fetch('{% url "evaluaciones:guardar_respuesta" %}', {
+                    method: 'POST',
+                    body: JSON.stringify({
+                        pregunta_id: preguntaId,
+                        respuesta: this.value
+                    }),
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
+                    }
+                });
+            }
+        });
+    });
+    
+    function actualizarProgreso() {
+        const porcentaje = Math.round((preguntasRespondidas.size / totalPreguntas) * 100);
+        const barra = document.getElementById('progreso');
+        barra.style.width = porcentaje + '%';
+        barra.textContent = porcentaje + '%';
+        
+        if (porcentaje === 100) {
+            barra.className = 'progress-bar bg-success';
+        } else if (porcentaje > 50) {
+            barra.className = 'progress-bar bg-warning';
+        } else {
+            barra.className = 'progress-bar bg-info';
+        }
+    }
+});
+</script>
+{% endblock %}
