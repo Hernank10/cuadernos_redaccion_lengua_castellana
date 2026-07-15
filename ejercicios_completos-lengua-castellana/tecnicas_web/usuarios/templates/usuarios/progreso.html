@@ -1,0 +1,62 @@
+{% extends 'core/base.html' %}
+
+{% block content %}
+<h3><i class="bi bi-graph-up"></i> Mi Progreso</h3>
+<p class="text-muted">Sigue tu avance en el aprendizaje</p>
+
+<div class="row">
+    <div class="col-md-4">
+        <div class="card text-center">
+            <div class="card-body">
+                <h5 class="card-title">📚 Técnicas</h5>
+                <p class="display-4">{{ tecnicas_vistas|default:0 }}</p>
+                <small class="text-muted">Técnicas disponibles</small>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card text-center">
+            <div class="card-body">
+                <h5 class="card-title">📖 Cursos Activos</h5>
+                <p class="display-4">{{ cursos_en_progreso.count|default:0 }}</p>
+                <small class="text-muted">Cursos en progreso</small>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card text-center">
+            <div class="card-body">
+                <h5 class="card-title">✅ Lecciones</h5>
+                <p class="display-4">{{ lecciones_completadas|default:0 }}</p>
+                <small class="text-muted">Lecciones completadas</small>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% if cursos_en_progreso %}
+<h4 class="mt-4">📋 Cursos en Progreso</h4>
+<div class="list-group">
+    {% for inscripcion in cursos_en_progreso %}
+    <a href="{% url 'cursos:detalle' inscripcion.curso.id %}" class="list-group-item list-group-item-action">
+        <div class="d-flex justify-content-between align-items-center">
+            <div>
+                <h5>{{ inscripcion.curso.titulo }}</h5>
+                <div class="progress" style="width: 200px;">
+                    <div class="progress-bar bg-success" role="progressbar" style="width: {{ inscripcion.progreso }}%">
+                        {{ inscripcion.progreso }}%
+                    </div>
+                </div>
+            </div>
+            <span class="badge bg-primary">{{ inscripcion.get_estado_display }}</span>
+        </div>
+    </a>
+    {% endfor %}
+</div>
+{% else %}
+<div class="alert alert-info mt-4">
+    <i class="bi bi-info-circle"></i> No estás inscrito en ningún curso.
+    <a href="{% url 'cursos:lista' %}" class="alert-link">Explora los cursos disponibles</a>
+</div>
+{% endif %}
+{% endblock %}

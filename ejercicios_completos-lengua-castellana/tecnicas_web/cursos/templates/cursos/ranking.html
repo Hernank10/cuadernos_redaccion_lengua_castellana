@@ -1,0 +1,62 @@
+{% extends 'core/base.html' %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12 text-center mb-4">
+        <h2><i class="bi bi-trophy"></i> Ranking de Usuarios</h2>
+        <p class="text-muted">¡Mira quiénes están liderando el aprendizaje!</p>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-8 mx-auto">
+        <div class="card">
+            <div class="card-header bg-warning">
+                <h5 class="mb-0"><i class="bi bi-star-fill"></i> Top 10 Usuarios</h5>
+            </div>
+            <div class="card-body">
+                <div class="list-group">
+                    {% for usuario in top_usuarios %}
+                    <div class="list-group-item d-flex justify-content-between align-items-center">
+                        <div>
+                            {% if forloop.counter == 1 %}
+                            <span class="badge bg-warning" style="font-size: 1.5rem;">🥇</span>
+                            {% elif forloop.counter == 2 %}
+                            <span class="badge bg-secondary" style="font-size: 1.5rem;">🥈</span>
+                            {% elif forloop.counter == 3 %}
+                            <span class="badge bg-danger" style="font-size: 1.5rem;">🥉</span>
+                            {% else %}
+                            <span class="badge bg-light text-dark">#{{ forloop.counter }}</span>
+                            {% endif %}
+                            <strong>{{ usuario.usuario.username }}</strong>
+                            <small class="text-muted">{{ usuario.usuario.get_rol_display }}</small>
+                        </div>
+                        <div>
+                            <span class="badge bg-warning text-dark">
+                                <i class="bi bi-star"></i> {{ usuario.total_puntos }} pts
+                            </span>
+                            <span class="badge bg-primary">{{ usuario.usuario.insignias.count }} 🏅</span>
+                        </div>
+                    </div>
+                    {% empty %}
+                    <div class="alert alert-info">No hay usuarios registrados</div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+        
+        <div class="card mt-3">
+            <div class="card-header bg-info text-white">
+                <h5 class="mb-0"><i class="bi bi-person"></i> Tu Posición</h5>
+            </div>
+            <div class="card-body text-center">
+                <h2>#{{ posicion }}</h2>
+                <p class="mb-0">
+                    <i class="bi bi-star"></i> {{ puntos_usuario.total_puntos }} puntos
+                    <span class="badge bg-primary ms-2">{{ puntos_usuario.usuario.insignias.count }} insignias</span>
+                </p>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

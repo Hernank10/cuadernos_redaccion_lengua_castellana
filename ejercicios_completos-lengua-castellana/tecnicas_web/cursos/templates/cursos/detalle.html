@@ -1,0 +1,24 @@
+{% extends 'core/base.html' %}
+
+{% block content %}
+<div class="card">
+    <div class="card-header bg-primary text-white">
+        <h3>{{ curso.titulo }}</h3>
+    </div>
+    <div class="card-body">
+        <p>{{ curso.descripcion }}</p>
+        <p><strong>Nivel:</strong> {{ curso.get_nivel_display }}</p>
+        <p><strong>Lecciones:</strong> {{ curso.lecciones.count }}</p>
+        
+        <h4>Lecciones</h4>
+        <ul class="list-group">
+            {% for leccion in lecciones %}
+            <li class="list-group-item d-flex justify-content-between">
+                <span>{{ leccion.titulo }}</span>
+                <span class="badge bg-secondary">{{ leccion.duracion_minutos }} min</span>
+            </li>
+            {% endfor %}
+        </ul>
+    </div>
+</div>
+{% endblock %}

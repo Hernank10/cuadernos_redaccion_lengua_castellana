@@ -1,0 +1,33 @@
+{% extends 'core/base.html' %}
+
+{% block content %}
+<h3><i class="bi bi-clipboard-check"></i> Evaluaciones Disponibles</h3>
+<p class="text-muted">Pon a prueba tus conocimientos</p>
+
+<div class="row">
+    {% for evaluacion in evaluaciones %}
+    <div class="col-md-6 col-lg-4 mb-4">
+        <div class="card card-hover h-100">
+            <div class="card-body">
+                <h5 class="card-title">{{ evaluacion.titulo }}</h5>
+                <p class="card-text">{{ evaluacion.descripcion|truncatewords:15 }}</p>
+                <div class="mb-2">
+                    <span class="badge bg-info">{{ evaluacion.get_tipo_display }}</span>
+                    <span class="badge bg-secondary">{{ evaluacion.preguntas.count }} preguntas</span>
+                    <span class="badge bg-warning text-dark">{{ evaluacion.duracion_minutos }} min</span>
+                </div>
+                <a href="{% url 'evaluaciones:detalle' evaluacion.id %}" class="btn btn-primary w-100">
+                    <i class="bi bi-play-circle"></i> Iniciar
+                </a>
+            </div>
+        </div>
+    </div>
+    {% empty %}
+    <div class="col-12">
+        <div class="alert alert-info">
+            <i class="bi bi-info-circle"></i> No hay evaluaciones disponibles
+        </div>
+    </div>
+    {% endfor %}
+</div>
+{% endblock %}

@@ -1,0 +1,121 @@
+{% extends 'core/base.html' %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12 text-center mb-4">
+        <h2><i class="bi bi-trophy"></i> Tu Progreso</h2>
+        <p class="text-muted">Sigue tu avance y obtén insignias</p>
+    </div>
+</div>
+
+<div class="row mb-4">
+    <div class="col-md-4">
+        <div class="card text-center">
+            <div class="card-body">
+                <h5 class="card-title">⭐ Puntos</h5>
+                <p class="display-4 text-warning">{{ puntos_usuario.total_puntos }}</p>
+                <small class="text-muted">Sigue aprendiendo para ganar más puntos</small>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card text-center">
+            <div class="card-body">
+                <h5 class="card-title">🏅 Insignias</h5>
+                <p class="display-4 text-primary">{{ total_insignias }}</p>
+                <small class="text-muted">{{ todas_insignias.count }} insignias disponibles</small>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card text-center">
+            <div class="card-body">
+                <h5 class="card-title">🔥 Actividades</h5>
+                <p class="display-4 text-success">{{ total_actividades }}</p>
+                <small class="text-muted">¡Sigue activo!</small>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-6">
+        <h4><i class="bi bi-award"></i> Mis Insignias</h4>
+        <div class="row">
+            {% for insignia in insignias %}
+            <div class="col-6 col-md-4 mb-3">
+                <div class="card text-center">
+                    <div class="card-body">
+                        <div style="font-size: 3rem;">{{ insignia.insignia.icono }}</div>
+                        <h6>{{ insignia.insignia.nombre }}</h6>
+                        <span class="badge bg-{{ insignia.insignia.nivel }}">{{ insignia.insignia.nivel }}</span>
+                        <small class="d-block text-muted">{{ insignia.fecha_obtencion|date:"d/m/Y" }}</small>
+                    </div>
+                </div>
+            </div>
+            {% empty %}
+            <div class="col-12">
+                <div class="alert alert-info">
+                    <i class="bi bi-info-circle"></i> No tienes insignias aún. ¡Completa cursos y actividades para obtenerlas!
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+    
+    <div class="col-md-6">
+        <h4><i class="bi bi-clock-history"></i> Actividades Recientes</h4>
+        <div class="list-group">
+            {% for actividad in actividades %}
+            <div class="list-group-item">
+                <div class="d-flex justify-content-between">
+                    <div>
+                        <span class="badge bg-{{ actividad.tipo }}-light">{{ actividad.get_tipo_display }}</span>
+                        <p class="mb-0">{{ actividad.descripcion }}</p>
+                    </div>
+                    <div>
+                        {% if actividad.puntos > 0 %}
+                        <span class="badge bg-success">+{{ actividad.puntos }} pts</span>
+                        {% endif %}
+                        <small class="text-muted d-block">{{ actividad.fecha|timesince }}</small>
+                    </div>
+                </div>
+            </div>
+            {% empty %}
+            <div class="alert alert-info">
+                <i class="bi bi-info-circle"></i> No hay actividades registradas
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+
+<div class="row mt-4">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header bg-primary text-white">
+                <h5 class="mb-0"><i class="bi bi-star"></i> Insignias Disponibles</h5>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    {% for insignia in todas_insignias %}
+                    <div class="col-6 col-md-3 mb-3">
+                        <div class="card text-center h-100">
+                            <div class="card-body">
+                                <div style="font-size: 2.5rem;">{{ insignia.icono }}</div>
+                                <h6>{{ insignia.nombre }}</h6>
+                                <span class="badge bg-{{ insignia.nivel }}">{{ insignia.nivel }}</span>
+                                <small class="d-block text-muted">
+                                    {{ insignia.puntos_requeridos }} pts · 
+                                    {{ insignia.cursos_requeridos }} cursos
+                                </small>
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

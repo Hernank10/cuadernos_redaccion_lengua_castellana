@@ -9,11 +9,25 @@ django.setup()
 
 from core.models import Tecnica
 
-print("📥 Importando datos...")
+print("📥 Importando datos a Django...")
 
+# Conectar a la base de datos SQLite original
 conn = sqlite3.connect('tecnicas_lengua.db')
 cursor = conn.cursor()
 
+# Verificar si la tabla existe
+cursor.execute("SELECT name FROM sqlite_master WHERE type='table' AND name='tecnicas'")
+if not cursor.fetchone():
+    print("❌ La tabla 'tecnicas' no existe en la base de datos")
+    print("📋 Tablas disponibles:")
+    cursor.execute("SELECT name FROM sqlite_master WHERE type='table'")
+    tables = cursor.fetchall()
+    for table in tables:
+        print(f"   - {table[0]}")
+    conn.close()
+    sys.exit(1)
+
+# Obtener datos
 cursor.execute("SELECT id, titulo, contenido, categoria, subcategoria, grado, tipo, ruta_archivo FROM tecnicas")
 rows = cursor.fetchall()
 
@@ -28,15 +42,17 @@ for row in rows:
         defaults={
             'titulo': titulo,
             'contenido': contenido,
-            'categoria': categoria,
-            'subcategoria': subcategoria,
-            'grado': grado,
-            'tipo': tipo,
-            'ruta_archivo': ruta
+            'categoria': categoria or 'General',
+            'subcategoria': subcategoria or '',
+            'grado': grado or '',
+            'tipo': tipo or '',
+            'ruta_archivo': ruta or ''
         }
     )
     if created:
         contador += 1
+        if contador % 10 == 0:
+            print(f"   Importadas {contador} técnicas...")
 
 conn.close()
 

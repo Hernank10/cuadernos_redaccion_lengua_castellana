@@ -1,0 +1,31 @@
+{% extends 'core/base.html' %}
+
+{% block content %}
+<h3><i class="bi bi-mortarboard"></i> Cursos Disponibles</h3>
+<p class="text-muted">Explora los cursos y comienza tu aprendizaje</p>
+
+<div class="row">
+    {% for curso in cursos %}
+    <div class="col-md-6 col-lg-4 mb-4">
+        <div class="card card-hover h-100">
+            <div class="card-body">
+                <h5 class="card-title">{{ curso.titulo }}</h5>
+                <p class="card-text">{{ curso.descripcion|truncatewords:20 }}</p>
+                <div class="mb-2">
+                    <span class="badge bg-info">{{ curso.get_nivel_display }}</span>
+                    <span class="badge bg-secondary">{{ curso.total_lecciones }} lecciones</span>
+                    <span class="badge bg-success">{{ curso.estudiantes_count }} estudiantes</span>
+                </div>
+                <a href="{% url 'cursos:detalle' curso.id %}" class="btn btn-primary w-100">
+                    <i class="bi bi-eye"></i> Ver Curso
+                </a>
+            </div>
+        </div>
+    </div>
+    {% empty %}
+    <div class="col-12">
+        <div class="alert alert-info">No hay cursos disponibles aún</div>
+    </div>
+    {% endfor %}
+</div>
+{% endblock %}

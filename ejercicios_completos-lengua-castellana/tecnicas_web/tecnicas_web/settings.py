@@ -66,3 +66,31 @@ STATICFILES_DIRS = [BASE_DIR / 'static']
 STATIC_ROOT = BASE_DIR / 'staticfiles'
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+# Aplicaciones del LMS
+INSTALLED_APPS += [
+    'usuarios',
+    'cursos',
+    'evaluaciones',
+    'progreso',
+]
+
+# Configuración de autenticación
+AUTH_USER_MODEL = 'usuarios.Usuario'
+LOGIN_URL = 'usuarios:login'
+LOGIN_REDIRECT_URL = 'core:index'
+LOGOUT_REDIRECT_URL = 'core:index'
+
+# Configuración de medios (para avatars)
+MEDIA_URL = '/media/'
+MEDIA_ROOT = BASE_DIR / 'media'
+
+# Configuración de mensajes
+from django.contrib.messages import constants as messages
+MESSAGE_TAGS = {
+    messages.DEBUG: 'debug',
+    messages.INFO: 'info',
+    messages.SUCCESS: 'success',
+    messages.WARNING: 'warning',
+    messages.ERROR: 'danger',
+}

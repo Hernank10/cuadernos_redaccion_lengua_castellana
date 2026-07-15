@@ -1,0 +1,74 @@
+{% extends 'core/base.html' %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-8 mx-auto">
+        <div class="card">
+            <div class="card-header bg-primary text-white">
+                <h4 class="mb-0"><i class="bi bi-plus-circle"></i> {{ titulo }}</h4>
+            </div>
+            <div class="card-body">
+                <form method="post">
+                    {% csrf_token %}
+                    
+                    <div class="mb-3">
+                        <label for="titulo" class="form-label">Título del Curso *</label>
+                        <input type="text" class="form-control" id="titulo" name="titulo" 
+                               value="{{ curso.titulo|default:'' }}" required>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="descripcion" class="form-label">Descripción *</label>
+                        <textarea class="form-control" id="descripcion" name="descripcion" rows="4" required>{{ curso.descripcion|default:'' }}</textarea>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="nivel" class="form-label">Nivel</label>
+                            <select class="form-control" id="nivel" name="nivel">
+                                <option value="principiante" {% if curso.nivel == 'principiante' %}selected{% endif %}>Principiante</option>
+                                <option value="intermedio" {% if curso.nivel == 'intermedio' %}selected{% endif %}>Intermedio</option>
+                                <option value="avanzado" {% if curso.nivel == 'avanzado' %}selected{% endif %}>Avanzado</option>
+                                <option value="experto" {% if curso.nivel == 'experto' %}selected{% endif %}>Experto</option>
+                            </select>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label for="duracion_horas" class="form-label">Duración (horas)</label>
+                            <input type="number" class="form-control" id="duracion_horas" name="duracion_horas" 
+                                   value="{{ curso.duracion_horas|default:'10' }}" min="1">
+                        </div>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="tecnicas" class="form-label">Técnicas Asociadas</label>
+                        <select class="form-control" id="tecnicas" name="tecnicas" multiple size="5">
+                            {% for tecnica in tecnicas %}
+                            <option value="{{ tecnica.id }}" 
+                                    {% if curso and tecnica in curso.tecnicas.all %}selected{% endif %}>
+                                {{ tecnica.titulo|truncatechars:80 }} ({{ tecnica.categoria }})
+                            </option>
+                            {% endfor %}
+                        </select>
+                        <small class="text-muted">Mantén presionado Ctrl (Cmd en Mac) para seleccionar múltiples</small>
+                    </div>
+                    
+                    <div class="mb-3 form-check">
+                        <input type="checkbox" class="form-check-input" id="publicado" name="publicado" 
+                               {% if curso.publicado %}checked{% endif %}>
+                        <label class="form-check-label" for="publicado">Publicar curso</label>
+                    </div>
+                    
+                    <div class="d-grid gap-2">
+                        <button type="submit" class="btn btn-primary">
+                            <i class="bi bi-save"></i> Guardar Curso
+                        </button>
+                        <a href="{% url 'cursos:lista' %}" class="btn btn-secondary">
+                            <i class="bi bi-arrow-left"></i> Cancelar
+                        </a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,74 @@
+{% extends 'core/base.html' %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-12">
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a href="{% url 'cursos:lista' %}">Cursos</a></li>
+                <li class="breadcrumb-item"><a href="{% url 'cursos:detalle' curso.id %}">{{ curso.titulo|truncatechars:30 }}</a></li>
+                <li class="breadcrumb-item active">{{ leccion.titulo|truncatechars:40 }}</li>
+            </ol>
+        </nav>
+        
+        <div class="card">
+            <div class="card-header bg-primary text-white">
+                <h4 class="mb-0">{{ leccion.titulo }}</h4>
+            </div>
+            <div class="card-body">
+                <p>{{ leccion.descripcion }}</p>
+                
+                {% if tecnica and tecnica.contenido %}
+                <div class="mt-3 p-3 bg-light rounded">
+                    <h5><i class="bi bi-file-text"></i> Contenido</h5>
+                    <div class="contenido-tecnica">
+                        {{ tecnica.contenido|truncatewords:100|safe }}
+                    </div>
+                    <a href="{% url 'core:tecnica_detail' tecnica.id %}" target="_blank" class="btn btn-sm btn-outline-primary mt-2">
+                        <i class="bi bi-box-arrow-up-right"></i> Ver técnica completa
+                    </a>
+                </div>
+                {% endif %}
+                
+                <div class="mt-4 d-flex justify-content-between">
+                    <div>
+                        {% if anterior %}
+                        <a href="{% url 'cursos:leccion_detalle' curso.id anterior.id %}" class="btn btn-secondary">
+                            <i class="bi bi-arrow-left"></i> Anterior
+                        </a>
+                        {% endif %}
+                    </div>
+                    <div>
+                        {% if not progreso.completado %}
+                        <form method="post" action="{% url 'cursos:completar' curso.id leccion.id %}">
+                            {% csrf_token %}
+                            <button type="submit" class="btn btn-success">
+                                <i class="bi bi-check-circle"></i> Marcar como completado
+                            </button>
+                        </form>
+                        {% else %}
+                        <span class="badge bg-success p-2">
+                            <i class="bi bi-check-circle-fill"></i> Completado
+                        </span>
+                        {% endif %}
+                    </div>
+                    <div>
+                        {% if siguiente %}
+                        <a href="{% url 'cursos:leccion_detalle' curso.id siguiente.id %}" class="btn btn-primary">
+                            Siguiente <i class="bi bi-arrow-right"></i>
+                        </a>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+.contenido-tecnica {
+    max-height: 400px;
+    overflow: auto;
+}
+</style>
+{% endblock %}

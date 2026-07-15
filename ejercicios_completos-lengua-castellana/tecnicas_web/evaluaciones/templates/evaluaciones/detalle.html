@@ -1,0 +1,58 @@
+{% extends 'core/base.html' %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-12">
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a href="{% url 'evaluaciones:lista' %}">Evaluaciones</a></li>
+                <li class="breadcrumb-item active">{{ evaluacion.titulo }}</li>
+            </ol>
+        </nav>
+        
+        <div class="card">
+            <div class="card-header bg-primary text-white">
+                <h4 class="mb-0">{{ evaluacion.titulo }}</h4>
+            </div>
+            <div class="card-body">
+                <p>{{ evaluacion.descripcion }}</p>
+                <div class="mb-3">
+                    <span class="badge bg-info">{{ evaluacion.get_tipo_display }}</span>
+                    <span class="badge bg-secondary">{{ evaluacion.preguntas.count }} preguntas</span>
+                    <span class="badge bg-warning text-dark">{{ evaluacion.duracion_minutos }} min</span>
+                </div>
+                
+                {% if resultado %}
+                <div class="alert alert-info">
+                    <h5>Resultado Anterior</h5>
+                    <p>Puntaje: {{ resultado.puntaje_obtenido }}%</p>
+                    <p>Estado: {% if resultado.aprobado %}✅ Aprobado{% else %}❌ No aprobado{% endif %}</p>
+                </div>
+                {% endif %}
+                
+                <h5><i class="bi bi-list-ol"></i> Preguntas</h5>
+                <div class="list-group">
+                    {% for pregunta in preguntas %}
+                    <div class="list-group-item">
+                        <div class="d-flex justify-content-between">
+                            <div>
+                                <span class="badge bg-secondary">#{{ forloop.counter }}</span>
+                                <span class="badge bg-info">{{ pregunta.get_tipo_display }}</span>
+                                <strong>{{ pregunta.pregunta|truncatechars:100 }}</strong>
+                            </div>
+                            <span class="badge bg-primary">{{ pregunta.puntaje }} pts</span>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+                
+                <div class="mt-3">
+                    <a href="{% url 'evaluaciones:lista' %}" class="btn btn-secondary">
+                        <i class="bi bi-arrow-left"></i> Volver
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
