@@ -1,59 +1,61 @@
 <!DOCTYPE html>
+{% load static %}
 <html lang="es">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{{ titulo|default:"Técnicas de Lengua Castellana" }}</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.8.1/font/bootstrap-icons.css">
-    <style>
-        .navbar-brand { font-weight: bold; }
-        .card-hover:hover { transform: translateY(-5px); box-shadow: 0 10px 20px rgba(0,0,0,0.1); transition: all 0.3s; }
-        .contenido-preview { max-height: 150px; overflow: hidden; }
-        .avatar-circle {
-            width: 40px;
-            height: 40px;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            background: #0d6efd;
-            color: white;
-            font-weight: bold;
-        }
-        .rol-badge {
-            font-size: 0.7rem;
-            padding: 2px 8px;
-        }
-        .admin-only { border-left: 3px solid #dc3545; }
-        .profesor-only { border-left: 3px solid #ffc107; }
-        .estudiante-only { border-left: 3px solid #198754; }
-    </style>
+    
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <!-- Bootstrap -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    
+    <!-- Bootstrap Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
+    
+    <!-- Estilos personalizados -->
+    <link rel="stylesheet" href="{% static 'css/custom.css' %}">
+    <link rel="stylesheet" href="{% static 'css/dark-mode.css' %}">
+    
+    {% block extra_css %}{% endblock %}
 </head>
 <body>
-    <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
+    <!-- Navbar Mejorada -->
+    <nav class="navbar navbar-expand-lg navbar-custom sticky-top">
         <div class="container">
             <a class="navbar-brand" href="{% url 'core:index' %}">
                 <i class="bi bi-book"></i> Técnicas Lengua
             </a>
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+            <button class="navbar-toggler border-0" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
                 <span class="navbar-toggler-icon"></span>
             </button>
             <div class="collapse navbar-collapse" id="navbarNav">
                 <ul class="navbar-nav me-auto">
                     <li class="nav-item">
-                        <a class="nav-link" href="{% url 'core:tecnicas_list' %}">
+                        <a class="nav-link {% if request.path == '/' %}active{% endif %}" href="{% url 'core:index' %}">
+                            <i class="bi bi-house"></i> Inicio
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link {% if '/tecnicas/' in request.path %}active{% endif %}" href="{% url 'core:tecnicas_list' %}">
                             <i class="bi bi-list-ul"></i> Técnicas
                         </a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="{% url 'core:categorias' %}">
+                        <a class="nav-link {% if '/categorias/' in request.path %}active{% endif %}" href="{% url 'core:categorias' %}">
                             <i class="bi bi-tags"></i> Categorías
                         </a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="{% url 'cursos:lista' %}">
+                        <a class="nav-link {% if '/cursos/' in request.path %}active{% endif %}" href="{% url 'cursos:lista' %}">
                             <i class="bi bi-mortarboard"></i> Cursos
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link {% if '/evaluaciones/' in request.path %}active{% endif %}" href="{% url 'evaluaciones:lista' %}">
+                            <i class="bi bi-clipboard-check"></i> Evaluaciones
                         </a>
                     </li>
                     {% if user.is_authenticated %}
@@ -62,22 +64,10 @@
                             <i class="bi bi-graph-up"></i> Progreso
                         </a>
                     </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="{% url 'usuarios:favoritos' %}">
-                            <i class="bi bi-heart"></i> Favoritos
-                        </a>
-                    </li>
                     {% if user.es_profesor or user.is_superuser %}
                     <li class="nav-item">
-                        <a class="nav-link" href="{% url 'cursos:lista' %}?crear=true">
-                            <i class="bi bi-plus-circle"></i> Crear Curso
-                        </a>
-                    </li>
-                    {% endif %}
-                    {% if user.is_superuser %}
-                    <li class="nav-item">
-                        <a class="nav-link" href="/admin/" target="_blank">
-                            <i class="bi bi-gear"></i> Admin
+                        <a class="nav-link" href="{% url 'generador:dashboard' %}">
+                            <i class="bi bi-robot"></i> Generador
                         </a>
                     </li>
                     {% endif %}
@@ -92,11 +82,11 @@
                                 {{ user.username|first|upper }}
                             </div>
                         </a>
-                        <ul class="dropdown-menu dropdown-menu-end">
+                        <ul class="dropdown-menu dropdown-menu-end shadow-lg border-0 rounded-3">
                             <li>
                                 <span class="dropdown-item-text">
                                     <strong>{{ user.username }}</strong><br>
-                                    <span class="badge bg-primary rol-badge">{{ user.get_rol_display }}</span>
+                                    <span class="badge bg-primary">{{ user.get_rol_display }}</span>
                                 </span>
                             </li>
                             <li><hr class="dropdown-divider"></li>
@@ -125,6 +115,11 @@
                             {% endif %}
                             <li><hr class="dropdown-divider"></li>
                             <li>
+                                <button class="dropdown-item" onclick="toggleDarkMode()">
+                                    <i class="bi bi-moon"></i> Modo Oscuro
+                                </button>
+                            </li>
+                            <li>
                                 <a class="dropdown-item text-danger" href="{% url 'usuarios:logout' %}">
                                     <i class="bi bi-box-arrow-right"></i> Cerrar Sesión
                                 </a>
@@ -138,7 +133,7 @@
                         </a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link btn btn-light text-primary" href="{% url 'usuarios:registro' %}">
+                        <a class="nav-link btn btn-primary text-white ms-2" href="{% url 'usuarios:registro' %}">
                             <i class="bi bi-person-plus"></i> Registrarse
                         </a>
                     </li>
@@ -148,11 +143,13 @@
         </div>
     </nav>
 
+    <!-- Main Content -->
     <main class="py-4">
         <div class="container">
             {% if messages %}
                 {% for message in messages %}
-                    <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+                    <div class="alert alert-{{ message.tags }} alert-dismissible fade show shadow-sm rounded-3 animate-fade-in" role="alert">
+                        <i class="bi bi-{% if message.tags == 'success' %}check-circle{% elif message.tags == 'error' %}exclamation-circle{% else %}info-circle{% endif %}"></i>
                         {{ message }}
                         <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
                     </div>
@@ -163,14 +160,36 @@
         </div>
     </main>
 
-    <footer class="bg-light py-3 mt-5">
-        <div class="container text-center">
-            <p class="text-muted mb-0">
-                <i class="bi bi-database"></i> LMS - Técnicas de Lengua Castellana
-            </p>
+    <!-- Footer Mejorado -->
+    <footer class="footer-custom">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-6">
+                    <h5 class="text-white mb-3">
+                        <i class="bi bi-book"></i> Técnicas de Lengua Castellana
+                    </h5>
+                    <p class="text-muted">
+                        LMS completo para el aprendizaje de la lengua castellana.
+                        {% if total_tecnicas %} {{ total_tecnicas }} técnicas disponibles.{% endif %}
+                    </p>
+                </div>
+                <div class="col-md-6 text-md-end">
+                    <p class="mb-2">
+                        <a href="https://github.com/Hernank10/cuadernos_redaccion_lengua_castellana" target="_blank" class="text-white-50">
+                            <i class="bi bi-github"></i> GitHub
+                        </a>
+                    </p>
+                    <small class="text-muted">
+                        © {% now "Y" %} - Todos los derechos reservados
+                    </small>
+                </div>
+            </div>
         </div>
     </footer>
 
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="{% static 'js/main.js' %}"></script>
+    {% block extra_js %}{% endblock %}
 </body>
 </html>
