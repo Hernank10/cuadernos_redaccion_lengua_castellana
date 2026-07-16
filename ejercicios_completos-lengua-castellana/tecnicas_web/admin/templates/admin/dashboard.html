@@ -1,0 +1,143 @@
+{% extends 'core/base.html' %}
+
+{% block content %}
+<h2><i class="bi bi-speedometer2"></i> Dashboard de Administración</h2>
+<p class="text-muted">Estadísticas y métricas del sistema</p>
+
+<!-- Tarjetas de estadísticas -->
+<div class="row mb-4">
+    <div class="col-md-3">
+        <div class="card text-center">
+            <div class="card-body">
+                <h6 class="card-title">👤 Usuarios</h6>
+                <p class="display-6">{{ stats.usuarios }}</p>
+                <small>Estudiantes: {{ stats.estudiantes }} | Profesores: {{ stats.profesores }}</small>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card text-center">
+            <div class="card-body">
+                <h6 class="card-title">📚 Cursos</h6>
+                <p class="display-6">{{ stats.cursos }}</p>
+                <small>Publicados: {{ stats.cursos_publicados }}</small>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card text-center">
+            <div class="card-body">
+                <h6 class="card-title">📝 Inscripciones</h6>
+                <p class="display-6">{{ stats.inscripciones }}</p>
+                <small>Activas: {{ stats.inscripciones_activas }}</small>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card text-center">
+            <div class="card-body">
+                <h6 class="card-title">🎓 Certificados</h6>
+                <p class="display-6">{{ stats.certificados }}</p>
+                <small>Evaluaciones: {{ stats.evaluaciones }}</small>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Gráficos con Chart.js -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<div class="row">
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-body">
+                <h6>Distribución de Usuarios</h6>
+                <canvas id="usuariosChart"></canvas>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-body">
+                <h6>Cursos por Nivel</h6>
+                <canvas id="cursosChart"></canvas>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row mt-4">
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-body">
+                <h6>Estado de Inscripciones</h6>
+                <canvas id="inscripcionesChart"></canvas>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-body">
+                <h6>Evaluaciones por Tipo</h6>
+                <canvas id="evaluacionesChart"></canvas>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const data = {{ chart_data|safe }};
+    
+    // Usuarios por rol
+    new Chart(document.getElementById('usuariosChart'), {
+        type: 'pie',
+        data: {
+            labels: data.usuarios_por_rol.map(d => d.rol),
+            datasets: [{
+                data: data.usuarios_por_rol.map(d => d.count),
+                backgroundColor: ['#6C63FF', '#00D2A0', '#FF6584']
+            }]
+        }
+    });
+    
+    // Cursos por nivel
+    new Chart(document.getElementById('cursosChart'), {
+        type: 'bar',
+        data: {
+            labels: data.cursos_por_nivel.map(d => d.nivel),
+            datasets: [{
+                label: 'Cursos',
+                data: data.cursos_por_nivel.map(d => d.count),
+                backgroundColor: '#6C63FF'
+            }]
+        }
+    });
+    
+    // Inscripciones por estado
+    new Chart(document.getElementById('inscripcionesChart'), {
+        type: 'doughnut',
+        data: {
+            labels: data.inscripciones_por_estado.map(d => d.estado),
+            datasets: [{
+                data: data.inscripciones_por_estado.map(d => d.count),
+                backgroundColor: ['#FFC857', '#00D2A0', '#FF6B6B']
+            }]
+        }
+    });
+    
+    // Evaluaciones por tipo
+    new Chart(document.getElementById('evaluacionesChart'), {
+        type: 'bar',
+        data: {
+            labels: data.evaluaciones_por_tipo.map(d => d.tipo),
+            datasets: [{
+                label: 'Evaluaciones',
+                data: data.evaluaciones_por_tipo.map(d => d.count),
+                backgroundColor: '#4ECDC4'
+            }]
+        }
+    });
+});
+</script>
+{% endblock %}

@@ -1,0 +1,29 @@
+{
+  "fecha_generacion": "2026-07-16T12:21:00.280589",
+  "estadisticas": {
+    "usuarios": {
+      "total_usuarios": 2,
+      "estudiantes": 2,
+      "profesores": 0,
+      "roles": {
+        "estudiante": 2
+      }
+    },
+    "cursos": {
+      "total_cursos": 20,
+      "publicados": 20,
+      "inscripciones": 0,
+      "progreso_promedio": 0
+    },
+    "evaluaciones": {
+      "total_evaluaciones": 200,
+      "publicadas": 200,
+      "promedio_puntaje": 0,
+      "tasa_aprobacion": 0
+    },
+    "certificados": {
+      "total_certificados": 0
+    }
+  },
+  "datos_graficos": {}
+}
