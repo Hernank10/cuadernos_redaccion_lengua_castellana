@@ -2,6 +2,7 @@ from django.urls import path
 from . import views
 from . import views_lms
 from . import views_gamificacion
+from . import views_certificados
 
 app_name = 'cursos'
 
@@ -21,4 +22,10 @@ urlpatterns = [
     # Gamificación
     path('gamificacion/', views_gamificacion.gamificacion, name='gamificacion'),
     path('ranking/', views_gamificacion.ranking, name='ranking'),
+    
+    # Certificados
+    path('certificados/', views_certificados.mis_certificados, name='mis_certificados'),
+    path('certificados/<int:certificado_id>/', views_certificados.ver_certificado, name='ver_certificado'),
+    path('certificados/<int:certificado_id>/descargar/', views_certificados.descargar_certificado, name='descargar_certificado'),
+    path('certificados/verificar/<str:codigo>/', views_certificados.verificar_certificado, name='verificar_certificado'),
 ]

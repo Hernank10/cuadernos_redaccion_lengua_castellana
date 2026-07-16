@@ -144,3 +144,42 @@ class ActividadUsuario(models.Model):
     
     def __str__(self):
         return f"{self.usuario.username} - {self.get_tipo_display()}"
+
+# Agregar al final del archivo, después de los modelos existentes
+
+class Certificado(models.Model):
+    """Modelo para certificados de cursos completados"""
+    
+    usuario = models.ForeignKey(User, on_delete=models.CASCADE, related_name='certificados_curso')
+    curso = models.ForeignKey('Curso', on_delete=models.CASCADE, related_name='certificados_curso')
+    codigo = models.CharField(max_length=50, unique=True, blank=True)
+    fecha_emision = models.DateTimeField(auto_now_add=True)
+    fecha_completado = models.DateTimeField()
+    puntuacion = models.FloatField(default=0.0)
+    horas = models.IntegerField(default=0)
+    pdf_file = models.FileField(upload_to='certificados/', blank=True, null=True)
+    
+    class Meta:
+        ordering = ['-fecha_emision']
+        unique_together = ('usuario', 'curso')
+        verbose_name = 'Certificado'
+        verbose_name_plural = 'Certificados'
+    
+    def __str__(self):
+        return f"Certificado - {self.usuario.username} - {self.curso.titulo}"
+    
+    def generar_codigo(self):
+        import hashlib
+        import uuid
+        data = f"{self.usuario.id}{self.curso.id}{timezone.now().timestamp()}{uuid.uuid4()}"
+        codigo = hashlib.sha256(data.encode()).hexdigest()[:12].upper()
+        self.codigo = codigo
+        return codigo
+    
+    def save(self, *args, **kwargs):
+        if not self.codigo:
+            self.generar_codigo()
+        super().save(*args, **kwargs)
+    
+    def verificar_codigo(self, codigo):
+        return self.codigo == codigo

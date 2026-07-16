@@ -1,0 +1,46 @@
+{% extends 'core/base.html' %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-8">
+        <div class="card">
+            <div class="card-header {% if valido %}bg-success{% else %}bg-danger{% endif %} text-white">
+                <h4 class="mb-0">
+                    <i class="bi bi-shield-check"></i> 
+                    Verificación de Certificado
+                </h4>
+            </div>
+            <div class="card-body text-center">
+                {% if valido %}
+                <div style="font-size: 5rem; color: #00D2A0;">
+                    <i class="bi bi-check-circle-fill"></i>
+                </div>
+                <h2 class="text-success">✅ Certificado Válido</h2>
+                
+                <div class="mt-4">
+                    <p><strong>Nombre:</strong> 
+                        {{ certificado.usuario.first_name }} {{ certificado.usuario.last_name }}
+                    </p>
+                    <p><strong>Curso:</strong> {{ certificado.curso.titulo }}</p>
+                    <p><strong>Fecha:</strong> {{ certificado.fecha_emision|date:"d/m/Y" }}</p>
+                    <p><strong>Calificación:</strong> {{ certificado.puntuacion }}%</p>
+                    <p><strong>Código:</strong> <code>{{ certificado.codigo }}</code></p>
+                </div>
+                {% else %}
+                <div style="font-size: 5rem; color: #FF6B6B;">
+                    <i class="bi bi-x-circle-fill"></i>
+                </div>
+                <h2 class="text-danger">❌ Certificado Inválido</h2>
+                <p class="mt-4">El certificado no fue encontrado o no es válido.</p>
+                {% endif %}
+                
+                <div class="mt-4">
+                    <a href="{% url 'cursos:lista' %}" class="btn btn-primary">
+                        <i class="bi bi-arrow-left"></i> Ver Cursos
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,77 @@
+{% extends 'core/base.html' %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-10">
+        <div class="card">
+            <div class="card-header bg-primary text-white">
+                <h4 class="mb-0"><i class="bi bi-award"></i> Certificado</h4>
+            </div>
+            <div class="card-body text-center">
+                <div class="mb-4">
+                    <h1 class="display-1" style="color: #FFC857;">🏆</h1>
+                    <h2 class="text-gradient">CERTIFICADO DE FINALIZACIÓN</h2>
+                </div>
+                
+                <p>Este certificado se otorga a:</p>
+                <h1 class="display-4" style="color: #FF6584;">
+                    {{ certificado.usuario.first_name }} {{ certificado.usuario.last_name }}
+                </h1>
+                
+                <p class="mt-4">Por haber completado exitosamente el curso:</p>
+                <h3 style="color: #4ECDC4;">{{ certificado.curso.titulo }}</h3>
+                
+                <div class="row mt-4 justify-content-center">
+                    <div class="col-md-3">
+                        <div class="card">
+                            <div class="card-body">
+                                <h6>📅 Fecha</h6>
+                                <p>{{ certificado.fecha_completado|date:"d/m/Y" }}</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="card">
+                            <div class="card-body">
+                                <h6>⏱️ Duración</h6>
+                                <p>{{ certificado.horas }} horas</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="card">
+                            <div class="card-body">
+                                <h6>📊 Calificación</h6>
+                                <p>{{ certificado.puntuacion }}%</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="mt-4">
+                    <p><strong>🔑 Código de verificación:</strong></p>
+                    <code class="p-2 bg-light rounded">{{ certificado.codigo }}</code>
+                </div>
+                
+                <div class="mt-4">
+                    <p class="text-muted">
+                        Verificar en: 
+                        <a href="{% url 'cursos:verificar_certificado' certificado.codigo %}">
+                            https://{{ request.get_host }}{% url 'cursos:verificar_certificado' certificado.codigo %}
+                        </a>
+                    </p>
+                </div>
+                
+                <div class="mt-4">
+                    <a href="{% url 'cursos:descargar_certificado' certificado.id %}" class="btn btn-success btn-lg">
+                        <i class="bi bi-download"></i> Descargar PDF
+                    </a>
+                    <a href="{% url 'cursos:mis_certificados' %}" class="btn btn-secondary btn-lg">
+                        <i class="bi bi-arrow-left"></i> Volver
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

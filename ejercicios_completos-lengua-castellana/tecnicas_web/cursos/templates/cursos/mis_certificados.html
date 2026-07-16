@@ -1,0 +1,56 @@
+{% extends 'core/base.html' %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-12">
+        <h3><i class="bi bi-award"></i> Mis Certificados</h3>
+        <p class="text-muted">Certificados obtenidos al completar cursos</p>
+    </div>
+</div>
+
+{% if certificados %}
+<div class="row">
+    {% for certificado in certificados %}
+    <div class="col-md-6 col-lg-4 mb-4">
+        <div class="card card-hover">
+            <div class="card-body text-center">
+                <div style="font-size: 4rem; color: #FFC857;">
+                    <i class="bi bi-award-fill"></i>
+                </div>
+                <h5 class="card-title mt-2">{{ certificado.curso.titulo }}</h5>
+                <p class="card-text">
+                    <small class="text-muted">
+                        <i class="bi bi-calendar"></i> {{ certificado.fecha_emision|date:"d/m/Y" }}
+                    </small>
+                </p>
+                <div class="mb-2">
+                    <span class="badge bg-success">{{ certificado.puntuacion }}%</span>
+                    <span class="badge bg-info">{{ certificado.horas }} horas</span>
+                    <span class="badge bg-primary">{{ certificado.get_estado }}</span>
+                </div>
+                <p>
+                    <small class="text-muted">
+                        <i class="bi bi-key"></i> {{ certificado.codigo }}
+                    </small>
+                </p>
+                <div class="d-grid gap-2">
+                    <a href="{% url 'cursos:ver_certificado' certificado.id %}" class="btn btn-outline-primary btn-sm">
+                        <i class="bi bi-eye"></i> Ver Certificado
+                    </a>
+                    <a href="{% url 'cursos:descargar_certificado' certificado.id %}" class="btn btn-primary btn-sm">
+                        <i class="bi bi-download"></i> Descargar PDF
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+{% else %}
+<div class="alert alert-info">
+    <i class="bi bi-info-circle"></i> Aún no tienes certificados. 
+    Completa cursos para obtenerlos.
+    <a href="{% url 'cursos:lista' %}" class="alert-link">Ver cursos disponibles</a>
+</div>
+{% endif %}
+{% endblock %}
