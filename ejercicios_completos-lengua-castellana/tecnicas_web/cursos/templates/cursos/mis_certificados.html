@@ -17,7 +17,7 @@
                 <div style="font-size: 4rem; color: #FFC857;">
                     <i class="bi bi-award-fill"></i>
                 </div>
-                <h5 class="card-title mt-2">{{ certificado.curso.titulo }}</h5>
+                <h5 class="card-title mt-2">{{ certificado.curso.titulo|truncatechars:40 }}</h5>
                 <p class="card-text">
                     <small class="text-muted">
                         <i class="bi bi-calendar"></i> {{ certificado.fecha_emision|date:"d/m/Y" }}

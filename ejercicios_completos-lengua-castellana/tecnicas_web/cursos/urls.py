@@ -28,4 +28,5 @@ urlpatterns = [
     path('certificados/<int:certificado_id>/', views_certificados.ver_certificado, name='ver_certificado'),
     path('certificados/<int:certificado_id>/descargar/', views_certificados.descargar_certificado, name='descargar_certificado'),
     path('certificados/verificar/<str:codigo>/', views_certificados.verificar_certificado, name='verificar_certificado'),
+    path('certificado/curso/<int:curso_id>/', views_certificados.certificado_curso, name='certificado_curso'),
 ]

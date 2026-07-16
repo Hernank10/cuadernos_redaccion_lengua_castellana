@@ -11,13 +11,13 @@
                 </h4>
             </div>
             <div class="card-body text-center">
-                {% if valido and certificado %}
+                {% if valido %}
                 <div style="font-size: 5rem; color: #00D2A0;">
                     <i class="bi bi-check-circle-fill"></i>
                 </div>
                 <h2 class="text-success">✅ Certificado Válido</h2>
                 
-                <div class="mt-4 text-start">
+                <div class="mt-4">
                     <p><strong>Nombre:</strong> 
                         {{ certificado.usuario.get_full_name|default:certificado.usuario.username }}
                     </p>
@@ -32,7 +32,6 @@
                 </div>
                 <h2 class="text-danger">❌ Certificado Inválido</h2>
                 <p class="mt-4">El certificado no fue encontrado o no es válido.</p>
-                <p>Verifica que el código sea correcto.</p>
                 {% endif %}
                 
                 <div class="mt-4">
@@ -40,7 +39,7 @@
                         <i class="bi bi-arrow-left"></i> Ver Cursos
                     </a>
                     <a href="https://github.com/Hernank10/cuadernos_redaccion_lengua_castellana" target="_blank" class="btn btn-secondary">
-                        <i class="bi bi-github"></i> Ver en GitHub
+                        <i class="bi bi-github"></i> Verificar en GitHub
                     </a>
                 </div>
             </div>
@@ -48,3 +47,46 @@
     </div>
 </div>
 {% endblock %}
+python manage.py shell << 'EOF'
+from cursos.models import Curso, Inscripcion, Certificado
+from usuarios.models import Usuario
+from django.utils import timezone
+
+# Obtener un estudiante y un curso
+estudiante = Usuario.objects.first()
+curso = Curso.objects.first()
+
+if estudiante and curso:
+    # Crear inscripción completada si no existe
+    inscripcion, created = Inscripcion.objects.get_or_create(
+        estudiante=estudiante,
+        curso=curso,
+        defaults={
+            'estado': 'completado',
+            'progreso': 100,
+            'calificacion': 85,
+            'fecha_completado': timezone.now()
+        }
+    )
+    
+    if created:
+        print(f"✅ Inscripción completada para {estudiante.username}")
+    
+    # Crear certificado
+    certificado, created = Certificado.objects.get_or_create(
+        usuario=estudiante,
+        curso=curso,
+        defaults={
+            'fecha_completado': timezone.now(),
+            'puntuacion': 85,
+            'horas': curso.duracion_horas
+        }
+    )
+    
+    if created:
+        print(f"✅ Certificado creado para {estudiante.username} - {curso.titulo}")
+        print(f"   Código: {certificado.codigo}")
+    else:
+        print(f"ℹ️ Certificado ya existe: {certificado.codigo}")
+else:
+    print("❌ No se encontraron datos")

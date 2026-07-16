@@ -1,24 +1,94 @@
 {% extends 'core/base.html' %}
 
 {% block content %}
-<div class="card">
-    <div class="card-header bg-primary text-white">
+<div class="row">
+    <div class="col-md-8">
         <h3>{{ curso.titulo }}</h3>
-    </div>
-    <div class="card-body">
         <p>{{ curso.descripcion }}</p>
-        <p><strong>Nivel:</strong> {{ curso.get_nivel_display }}</p>
-        <p><strong>Lecciones:</strong> {{ curso.lecciones.count }}</p>
         
-        <h4>Lecciones</h4>
-        <ul class="list-group">
+        <div class="mb-3">
+            <span class="badge bg-info">{{ curso.get_nivel_display }}</span>
+            <span class="badge bg-secondary">{{ curso.lecciones.count }} lecciones</span>
+            <span class="badge bg-success">{{ curso.duracion_horas }} horas</span>
+        </div>
+        
+        {% if inscrito %}
+        <div class="progress mb-3">
+            <div class="progress-bar bg-success" role="progressbar" style="width: {{ progreso_total }}%">
+                {{ progreso_total }}% Completado
+            </div>
+        </div>
+        {% endif %}
+        
+        <h4><i class="bi bi-list-ul"></i> Lecciones</h4>
+        <div class="list-group">
             {% for leccion in lecciones %}
-            <li class="list-group-item d-flex justify-content-between">
-                <span>{{ leccion.titulo }}</span>
-                <span class="badge bg-secondary">{{ leccion.duracion_minutos }} min</span>
-            </li>
+            <a href="{% url 'cursos:leccion_detalle' curso.id leccion.id %}" class="list-group-item list-group-item-action">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        {% if inscrito and leccion.id in progreso %}
+                            <i class="bi bi-check-circle-fill text-success"></i>
+                        {% else %}
+                            <i class="bi bi-circle"></i>
+                        {% endif %}
+                        {{ leccion.titulo }}
+                    </div>
+                    <span class="badge bg-secondary">{{ leccion.duracion_minutos }} min</span>
+                </div>
+            </a>
             {% endfor %}
-        </ul>
+        </div>
+    </div>
+    
+    <div class="col-md-4">
+        <div class="card">
+            <div class="card-body">
+                <h5 class="card-title">Información del Curso</h5>
+                <p><strong>Nivel:</strong> {{ curso.get_nivel_display }}</p>
+                <p><strong>Duración:</strong> {{ curso.duracion_horas }} horas</p>
+                <p><strong>Lecciones:</strong> {{ curso.lecciones.count }}</p>
+                
+                {% if not inscrito %}
+                <form method="post">
+                    {% csrf_token %}
+                    <input type="hidden" name="inscribirse" value="1">
+                    <button type="submit" class="btn btn-success w-100">
+                        <i class="bi bi-plus-circle"></i> Inscribirse
+                    </button>
+                </form>
+                {% else %}
+                <div class="alert alert-success">
+                    <i class="bi bi-check-circle"></i> Inscrito
+                    {% if progreso_total >= 100 %}
+                    <br><span class="badge bg-warning text-dark">🎓 Curso Completado</span>
+                    {% endif %}
+                </div>
+                
+                {% if progreso_total >= 100 %}
+                <a href="{% url 'cursos:certificado_curso' curso.id %}" class="btn btn-primary w-100 mt-2">
+                    <i class="bi bi-award"></i> Ver Certificado
+                </a>
+                {% endif %}
+                {% endif %}
+            </div>
+        </div>
+        
+        {% if inscrito and progreso_total >= 100 %}
+        <div class="card mt-3 border-success">
+            <div class="card-body text-center">
+                <i class="bi bi-award-fill" style="font-size: 3rem; color: #FFC857;"></i>
+                <h5 class="mt-2">🎓 ¡Curso Completado!</h5>
+                <p class="text-muted">Has completado todas las lecciones</p>
+                <a href="{% url 'cursos:certificado_curso' curso.id %}" class="btn btn-success">
+                    <i class="bi bi-download"></i> Ver Certificado
+                </a>
+                <br>
+                <small class="text-muted mt-2 d-block">
+                    <i class="bi bi-shield-check"></i> Verificación incluida
+                </small>
+            </div>
+        </div>
+        {% endif %}
     </div>
 </div>
 {% endblock %}

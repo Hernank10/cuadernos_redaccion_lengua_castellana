@@ -15,7 +15,8 @@
                 
                 <p>Este certificado se otorga a:</p>
                 <h1 class="display-4" style="color: #FF6584;">
-                    {{ certificado.usuario.first_name }} {{ certificado.usuario.last_name }}
+                    {{ certificado.usuario.first_name|default:certificado.usuario.username }}
+                    {% if certificado.usuario.last_name %}{{ certificado.usuario.last_name }}{% endif %}
                 </h1>
                 
                 <p class="mt-4">Por haber completado exitosamente el curso:</p>
@@ -74,4 +75,13 @@
         </div>
     </div>
 </div>
+
+<style>
+.text-gradient {
+    background: linear-gradient(135deg, #6C63FF 0%, #4ECDC4 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+</style>
 {% endblock %}
