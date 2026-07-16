@@ -183,3 +183,138 @@ class Certificado(models.Model):
     
     def verificar_codigo(self, codigo):
         return self.codigo == codigo
+
+# ============================================
+# GAMIFICACIÓN AVANZADA
+# ============================================
+
+class NivelUsuario(models.Model):
+    """Niveles de usuario con beneficios"""
+    NIVELES = [
+        (1, '🌱 Novato'),
+        (2, '📚 Aprendiz'),
+        (3, '🔍 Explorador'),
+        (4, '🎓 Conocedor'),
+        (5, '⚡ Experto'),
+        (6, '🏆 Maestro'),
+        (7, '🧠 Sabio'),
+        (8, '👑 Leyenda'),
+        (9, '🌟 Mítico'),
+        (10, '✨ Dios de la Lengua'),
+    ]
+    
+    nivel = models.IntegerField(choices=NIVELES, default=1)
+    puntos_necesarios = models.IntegerField()
+    icono = models.CharField(max_length=50, default='⭐')
+    beneficio = models.TextField(blank=True, null=True)
+    
+    def __str__(self):
+        return f"Nivel {self.nivel}: {self.get_nivel_display()}"
+
+class InsigniaAvanzada(models.Model):
+    """Insignias con categorías y niveles"""
+    CATEGORIAS = [
+        ('aprendizaje', '📖 Aprendizaje'),
+        ('logro', '🏅 Logro'),
+        ('desafio', '⚡ Desafío'),
+        ('racha', '🔥 Racha'),
+        ('especial', '✨ Especial'),
+        ('social', '🤝 Social'),
+    ]
+    
+    NIVELES = [
+        ('bronce', '🥉 Bronce'),
+        ('plata', '🥈 Plata'),
+        ('oro', '🥇 Oro'),
+        ('platino', '💎 Platino'),
+        ('diamante', '👑 Diamante'),
+    ]
+    
+    nombre = models.CharField(max_length=100)
+    descripcion = models.TextField()
+    categoria = models.CharField(max_length=20, choices=CATEGORIAS)
+    nivel = models.CharField(max_length=20, choices=NIVELES, default='bronce')
+    icono = models.CharField(max_length=50, default='🏆')
+    puntos_requeridos = models.IntegerField(default=0)
+    cursos_requeridos = models.IntegerField(default=0)
+    lecciones_requeridas = models.IntegerField(default=0)
+    evaluaciones_aprobadas = models.IntegerField(default=0)
+    racha_dias = models.IntegerField(default=0)
+    
+    def __str__(self):
+        return f"{self.icono} {self.nombre} ({self.nivel})"
+
+class RachaUsuario(models.Model):
+    """Seguimiento de rachas de actividad"""
+    usuario = models.OneToOneField(User, on_delete=models.CASCADE, related_name='racha')
+    racha_actual = models.IntegerField(default=0)
+    racha_maxima = models.IntegerField(default=0)
+    ultimo_estudio = models.DateTimeField(blank=True, null=True)
+    
+    def __str__(self):
+        return f"{self.usuario.username} - {self.racha_actual} días"
+
+class Desafio(models.Model):
+    """Desafíos temporales para los usuarios"""
+    TIPOS = [
+        ('diario', '📅 Desafío Diario'),
+        ('semanal', '📆 Desafío Semanal'),
+        ('mensual', '📊 Desafío Mensual'),
+        ('especial', '🎯 Desafío Especial'),
+    ]
+    
+    titulo = models.CharField(max_length=200)
+    descripcion = models.TextField()
+    tipo = models.CharField(max_length=20, choices=TIPOS)
+    puntos_recompensa = models.IntegerField()
+    fecha_inicio = models.DateTimeField()
+    fecha_fin = models.DateTimeField()
+    completado_por = models.ManyToManyField(User, blank=True)
+    activo = models.BooleanField(default=True)
+    
+    def __str__(self):
+        return f"{self.titulo} ({self.tipo})"
+
+class LogroUsuario(models.Model):
+    """Logros detallados de usuarios"""
+    ESTADOS = [
+        ('en_progreso', '🔄 En Progreso'),
+        ('completado', '✅ Completado'),
+        ('reclamado', '🎁 Reclamado'),
+    ]
+    
+    usuario = models.ForeignKey(User, on_delete=models.CASCADE, related_name='logros_usuario')
+    insignia = models.ForeignKey('InsigniaAvanzada', on_delete=models.CASCADE)
+    progreso = models.IntegerField(default=0)
+    estado = models.CharField(max_length=20, choices=ESTADOS, default='en_progreso')
+    fecha_obtencion = models.DateTimeField(blank=True, null=True)
+    
+    class Meta:
+        unique_together = ('usuario', 'insignia')
+    
+    def __str__(self):
+        return f"{self.usuario.username} - {self.insignia.nombre} ({self.estado})"
+
+class EventoGamificacion(models.Model):
+    """Registro de eventos de gamificación"""
+    TIPOS = [
+        ('puntos', '⭐ Puntos Obtenidos'),
+        ('insignia', '🏅 Insignia Obtenida'),
+        ('nivel', '⬆️ Nivel Alcanzado'),
+        ('racha', '🔥 Racha Lograda'),
+        ('desafio', '⚡ Desafío Completado'),
+        ('logro', '🎯 Logro Alcanzado'),
+    ]
+    
+    usuario = models.ForeignKey(User, on_delete=models.CASCADE, related_name='eventos_gamificacion')
+    tipo = models.CharField(max_length=20, choices=TIPOS)
+    descripcion = models.CharField(max_length=500)
+    puntos = models.IntegerField(default=0)
+    metadata = models.JSONField(default=dict, blank=True)
+    fecha = models.DateTimeField(auto_now_add=True)
+    
+    class Meta:
+        ordering = ['-fecha']
+    
+    def __str__(self):
+        return f"{self.usuario.username} - {self.get_tipo_display()}"
